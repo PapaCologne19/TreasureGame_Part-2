@@ -4,17 +4,14 @@
 |-------------------------------------------------------
 */
 const options = {
-    "pleasing": "Pleasing smell",
-    "salts": "Salt's partner",
-    "put": "put a stop to",
-    "rise": "Rise suddenly",
-    "mix": "Mix cards up",
-    "add": "Add; Mix",
-    "total": "Total disorder",
-    "maze": "Maze",
-    "interrupt": "Interrupt; upset",
-    "move": "Move; Period of word",
-    "device": "Device or appliance",
+    "KIM": "HEAD OF CREATIVES",
+    "MIKE": "IT MANAGER",
+    "ROSE": "ROSE",
+    "ARIEL": "HEAD OF HR",
+    "BRYAN": "TRAINING",
+    "DIXIE": "SONGER",
+    "MANNY": "VICE PRESIDENT",
+    "VERON": "MA'AM VERON",
     "james philip": "HAHAAHA"
 };
 
@@ -80,7 +77,7 @@ const generateRandomValue = (array) => Math.floor(Math.random() * array.length);
 */
 const blocker = () => {
     let lettersButtons = document.querySelectorAll(".letters");
-    stopGame();
+    return stopGame();
 };
 
 
@@ -93,6 +90,7 @@ startBtn.addEventListener("click", () => {
     const selectedDifficulty = difficultySelect.value;
     if (selectedDifficulty) {
         controls.classList.add("hide");
+
         init();
     } else {
         alert("Please select a difficulty level.");
@@ -129,7 +127,7 @@ const generateWord = () => {
     const characters = randomWord.split('');
     characters.forEach((value) => {
         if (value === ' ') {
-            displayItem += '<span class="inputSpace">   </span>';
+            displayItem += '<span class="inputSpace space"></span>';
         } else {
             displayItem += '<span class="inputSpace">_</span>';
         }
@@ -142,7 +140,6 @@ const generateWord = () => {
     // Call the function to reveal at least two correct letters
     revealLetters();
 };
-
 
 
 /*
@@ -166,10 +163,15 @@ const revealLetters = () => {
     // Update the guessed word with the correct letters 
     // at the selected indices
     for (let i = 0; i < revealedIndices.length; i++) {
-        inputSpace[revealedIndices[i]].innerText = charArray[revealedIndices[i]];
+        const index = revealedIndices[i];
+        const revealedLetter = charArray[index];
+        const inputSpaceItem = inputSpace[index];
+        inputSpaceItem.innerText = revealedLetter;
+
+        // Add a specific class to the revealed letters
+        inputSpaceItem.classList.add("revealed");
     }
 };
-
 
 /*
 |-------------------------------------------------------
@@ -186,9 +188,8 @@ const init = () => {
     userInpSection.innerHTML = "";
     letterContainer.classList.add("hide");
     letterContainer.innerHTML = "";
-    generateWord();
     backgroundMusic.play();
-
+    generateWord();
 
     // For creating letter buttons
     for (let i = 65; i < 91; i++) {
@@ -203,12 +204,18 @@ const init = () => {
 
             // Character button onclick
             button.addEventListener("click", () => {
+                // Skip processing if the clicked button is a space
+                if (button.innerText === ' ') {
+                    return;
+                }
+
                 message.innerText = `Correct Letter`;
                 message.style.color = "#008000";
 
                 // Move the charArray declaration here
                 let charArray = randomWord.toUpperCase().split("");
                 let inputSpace = document.getElementsByClassName("inputSpace");
+
 
                 if (!charArray.includes(button.innerText)) {
                     // Play wrong sound for wrong letter
@@ -221,8 +228,8 @@ const init = () => {
                 // Remove the clicked button from the letter container
                 button.remove();
 
-                // If the clicked character is not a space and exists in the charArray, treat it as a correct guess
-                if (button.innerText !== ' ' && charArray.includes(button.innerText)) {
+                // If the clicked character exists in the charArray, treat it as a correct guess
+                if (charArray.includes(button.innerText)) {
                     charArray.forEach((char, index) => {
                         // If character in array is same as clicked button
                         if (char === button.innerText) {
@@ -230,32 +237,86 @@ const init = () => {
 
                             // Replace dash with letter
                             inputSpace[index].innerText = char;
+                            inputSpace[index].classList.remove("revealed");
+
 
                             // Increment counter
                             winCount += 1;
 
-                            // If winCount equals word length
-                            if (winCount == charArray.length - randomWord.split(' ').length) {
+                            // Calculate the total number of non-space characters
+                            const nonSpaceCharacters = charArray.filter(char => char !== ' ').length;
+
+                            // If winCount equals total non-space characters
+                            if (winCount === nonSpaceCharacters) {
                                 resultText.innerHTML = "You Won";
                                 applauseSound.play();
                                 startBtn.innerText = "Restart";
+
+                                var user = $('#difficulty').val(); // Get the value of the input with id 'difficulty'
+                                var score = $('#chanceCount').val();
+                                $.ajax({
+                                    data: {
+                                        button_click: 1,
+                                        user: user,
+                                        score: lossCount
+                                    },
+                                    type: "POST",
+                                    url: "action.php"
+                                });
 
                                 // Block all buttons
                                 blocker();
                             }
                         }
                     });
-                } else {
 
+                    // Check if the clicked letter is one of the revealed letters
+                    if (Array.from(inputSpace).some(input => input.innerText === button.innerText)) {
+                        // Remove the "correct" class to reset its color to white
+                        button.classList.remove("correct");
+                    }
+                } else {
                     // Lose count
                     button.classList.add("incorrect");
                     lossCount -= 1;
                     document.getElementById("chanceCount").innerText = `Chances Left: ${lossCount}`;
                     message.innerText = `Incorrect Letter`;
                     message.style.color = "#ff0000";
-                    if (lossCount == 0) {
+                    if (lossCount === 9) {
+                        document.getElementById('treasures').src = "img/1.png";
+                    } else if (lossCount === 8) {
+                        document.getElementById('treasures').src = "img/2.png";
+                    } else if (lossCount === 7) {
+                        document.getElementById('treasures').src = "img/3.png";
+                    } else if (lossCount === 6) {
+                        document.getElementById('treasures').src = "img/4.png";
+                    } else if (lossCount === 5) {
+                        document.getElementById('treasures').src = "img/5.png";
+                    } else if (lossCount === 4) {
+                        document.getElementById('treasures').src = "img/6.png";
+                    } else if (lossCount === 3) {
+                        document.getElementById('treasures').src = "img/7.png";
+                    } else if (lossCount === 2) {
+                        document.getElementById('treasures').src = "img/8.png";
+                    } else if (lossCount === 1) {
+                        document.getElementById('treasures').src = "img/9.png";
+                    } else if (lossCount == 0) {
                         word.innerHTML = `The word was: <span>${randomWord}</span>`;
                         resultText.innerHTML = "Game Over";
+
+                        var user = $('#difficulty').val(); // Get the value of the input with id 'difficulty'
+                        var score = $('#chanceCount').val();
+                        $.ajax({
+                            data: {
+                                button_click: 1,
+                                user: user,
+                                score: lossCount
+                            },
+                            type: "POST",
+                            url: "action.php"
+                        });
+
+
                         booSound.play();
                         blocker();
                     }
@@ -266,8 +327,8 @@ const init = () => {
             letterContainer.appendChild(button);
         }
     }
-
 };
+
 
 /*
 |-------------------------------------------------------
