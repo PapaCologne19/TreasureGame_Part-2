@@ -5,14 +5,14 @@
 */
 const options = {
     "KIM": "HEAD OF CREATIVES",
-    "MIKE": "IT MANAGER",
-    "ROSE": "ROSE",
-    "ARIEL": "HEAD OF HR",
+    "MIKE": "ANUNAKI MANAGER",
+    "ROSE": "FLOWER",
+    "DEO": "NOBODY",
     "BRYAN": "TRAINING",
     "DIXIE": "SONGER",
-    "MANNY": "VICE PRESIDENT",
-    "VERON": "MA'AM VERON",
-    "james philip": "HAHAAHA"
+    "MANNY": "EXEC. VICE PRESIDENT",
+    "VERON": "VP BSG",
+    "james philip": "IT SUPPORT"
 };
 
 
@@ -24,10 +24,14 @@ const options = {
 const message = document.getElementById("message");
 const hintRef = document.querySelector(".hint-ref");
 const controls = document.querySelector(".controls-container");
+const card = document.querySelector(".card");
+
 const startBtn = document.getElementById("start");
 const letterContainer = document.getElementById("letter-container");
 const userInpSection = document.getElementById("user-input-section");
 const resultText = document.getElementById("result");
+const resultText1 = document.getElementById("result1");
+const resultTextL = document.getElementById("resultl");
 const word = document.getElementById("word");
 const difficultySelect = document.getElementById("difficulty");
 const words = Object.keys(options);
@@ -90,10 +94,10 @@ startBtn.addEventListener("click", () => {
     const selectedDifficulty = difficultySelect.value;
     if (selectedDifficulty) {
         controls.classList.add("hide");
-
+        card1.classList.add("hide");
         init();
     } else {
-        alert("Please select a difficulty level.");
+        alert("Please select Player.");
     }
 
 
@@ -107,6 +111,7 @@ startBtn.addEventListener("click", () => {
 */
 const stopGame = () => {
     controls.classList.remove("hide");
+    card1.classList.remove("hide");
 };
 
 
@@ -189,7 +194,9 @@ const init = () => {
     letterContainer.classList.add("hide");
     letterContainer.innerHTML = "";
     backgroundMusic.play();
+    card.classList.add('dont_show');
     generateWord();
+
 
     // For creating letter buttons
     for (let i = 65; i < 91; i++) {
@@ -249,11 +256,20 @@ const init = () => {
                             // If winCount equals total non-space characters
                             if (winCount === nonSpaceCharacters) {
                                 resultText.innerHTML = "You Won";
+                                resultText1.innerHTML = lossCount;
+                                resultTextL.innerHTML = "Your Score is:";
                                 applauseSound.play();
-                                startBtn.innerText = "Restart";
+                                card.classList.remove('dont_show');
+
+                                difficultySelect.classList.add('dont_show');
+                                startBtn.classList.add('dont_show');
+
 
                                 var user = $('#difficulty').val(); // Get the value of the input with id 'difficulty'
                                 var score = $('#chanceCount').val();
+
+
+
                                 $.ajax({
                                     data: {
                                         button_click: 1,
@@ -303,9 +319,16 @@ const init = () => {
                     } else if (lossCount == 0) {
                         word.innerHTML = `The word was: <span>${randomWord}</span>`;
                         resultText.innerHTML = "Game Over";
+                        resultText1.innerHTML = lossCount;
+                        resultTextL.innerHTML = "Your Score is:";
+                        booSound.play();
+
 
                         var user = $('#difficulty').val(); // Get the value of the input with id 'difficulty'
                         var score = $('#chanceCount').val();
+
+
+
                         $.ajax({
                             data: {
                                 button_click: 1,
@@ -317,7 +340,6 @@ const init = () => {
                         });
 
 
-                        booSound.play();
                         blocker();
                     }
                 }
